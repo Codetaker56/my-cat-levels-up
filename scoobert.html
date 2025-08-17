@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scoobert RPG Diary</title>
+<style>
+    body { font-family: 'Comic Sans MS', cursive; background-color: #FFDD99; color: #333; text-align: center; padding: 20px; overflow-x: hidden;}
+    .stat-bar { width: 300px; height: 20px; background-color: #eee; margin: 5px auto; border-radius: 10px; overflow: hidden;}
+    .stat-fill { height: 100%; background-color: #FF9933; width: 0%; transition: width 0.3s;}
+    button { padding: 10px 15px; margin: 5px; font-size: 14px;}
+    #confetti {position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;}
+    #cat-icon {width: 100px; margin: 10px auto; transition: transform 0.3s;}
+    .log-container { max-width: 600px; margin: 20px auto; text-align: left; }
+    .log-card { background: #fff7e0; margin: 10px 0; padding: 10px; border-radius: 8px; border-left: 6px solid #FF9933; }
+    .log-title { font-weight: bold; }
+    .xp-bar-inner { height: 10px; border-radius: 5px; margin-top: 2px;}
+    .chaos-bar { background: #FF6666; width: 0%; transition: width 0.3s;}
+    .nap-bar { background: #66CCFF; width: 0%; transition: width 0.3s;}
+    .play-bar { background: #66FF66; width: 0%; transition: width 0.3s;}
+</style>
+</head>
+<body>
+
+<h1>Scoobert RPG Diary</h1>
+<img id="cat-icon" src="https://i.imgur.com/1bX5QH6.png" alt="Scoobert Cat Icon">
+
+<p id="level">Scoobert Level: 1</p>
+<p id="paw">Paw Size Level: 1</p>
+<p id="body">Body Size Level: 1</p>
+<p id="treats">Treats Given: 0</p>
+
+<h3>Chaos XP</h3>
+<div class="stat-bar"><div id="chaosBar" class="stat-fill"></div></div>
+<h3>Nap XP</h3>
+<div class="stat-bar"><div id="napBar" class="stat-fill"></div></div>
+<h3>Play XP</h3>
+<div class="stat-bar"><div id="playBar" class="stat-fill"></div></div>
+
+<div>
+    <button onclick="logTreat()">Give Treat</button>
+    <button onclick="logChaos()">Add Chaos XP</button>
+    <button onclick="logNap()">Add Nap XP</button>
+    <button onclick="logPlay()">Add Play XP</button>
+</div>
+
+<div>
+    <button onclick="saveFile()">Save Scoobert</button>
+    <input type="file" id="loadFileInput" onchange="loadFile(event)" style="display:none;">
+    <button onclick="document.getElementById('loadFileInput').click()">Load Scoobert</button>
+</div>
+
+<div class="log-container" id="logContainer"></div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+    // --- Stats ---
+    const birthday = new Date(2025, 7, 21);
+    const today = new Date();
+    let level = Math.floor((today - birthday)/(1000*60*60*24)) + 1;
+    let pawLevel = 1, bodyLevel = 1, treatsGiven = 0;
+    let chaosXP = 0, napXP = 0, playXP = 0;
+    const xpThreshold = 10;
+    const catIcon = document.getElementById("cat-icon");
+    const logContainer = document.getElementById("logContainer");
+
+    // --- Daily Log ---
+    let dailyLog = {}; // key = date string, value = {treats, chaos, nap, play}
+
+    function getTodayKey(){
+        const d = new Date();
+        return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+    }
+
+    function createLogCard(dateKey, data){
+        const card = document.createElement("div");
+        card.className = "log-card";
+        card.innerHTML = `<div class="log-title">Day: ${dateKey}</div>
+        Treats: ${data.treats}<br>
+        Chaos XP: <div class="xp-bar-inner chaos-bar" style="width:${data.chaos*10}%"></div>
+        Nap XP: <div class="xp-bar-inner nap-bar" style="width:${data.nap*10}%"></div>
+        Play XP: <div class="xp-bar-inner play-bar" style="width:${data.play*10}%"></div>`;
+        return card;
+    }
+
+    function updateDailyLog(){
+        const key = getTodayKey();
+        if(!dailyLog[key]) dailyLog[key] = {treats:0, chaos:0, nap:0, play:0};
+        updateDisplay();
+        renderLogs();
+    }
+
+    function renderLogs(){
+        logContainer.innerHTML = "";
+        Object.keys(dailyLog).sort().forEach(k=>{
+            logContainer.appendChild(createLogCard(k, dailyLog[k]));
+        });
+    }
+
+    // --- Functions ---
+    function checkUpgrade(xp, statLevel){
+        if(xp >= xpThreshold){ xp -= xpThreshold; statLevel+=1;}
+        return [xp, statLevel];
+    }
+
+    function updateDisplay(){
+        [chaosXP, pawLevel] = checkUpgrade(chaosXP, pawLevel);
+        [napXP, bodyLevel] = checkUpgrade(napXP, bodyLevel);
+
+        document.getElementById("level").innerText = `Scoobert Level: ${level}`;
+        document.getElementById("paw").innerText = `Paw Size Level: ${pawLevel}`;
+        document.getElementById("body").innerText = `Body Size Level: ${bodyLevel}`;
+        document.getElementById("treats").innerText = `Treats Given: ${treatsGiven}`;
+        document.getElementById("chaosBar").style.width = (chaosXP*10)+'%';
+        document.getElementById("napBar").style.width = (napXP*10)+'%';
+        document.getElementById("playBar").style.width = (playXP*10)+'%';
+        catIcon.style.transform = `scale(${1 + level*0.02})`;
+    }
+
+    function logTreat(){ treatsGiven++; chaosXP+=1; napXP+=1; playXP+=2;
+        const key = getTodayKey();
+        if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0};
+        dailyLog[key].treats++; dailyLog[key].chaos++; dailyLog[key].nap++; dailyLog[key].play+=2;
+        updateDisplay(); renderLogs();
+    }
+    function logChaos(){ chaosXP+=1; const key=getTodayKey(); if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0}; dailyLog[key].chaos++; updateDisplay(); renderLogs();}
+    function logNap(){ napXP+=1; const key=getTodayKey(); if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0}; dailyLog[key].nap++; updateDisplay(); renderLogs();}
+    function logPlay(){ playXP+=1; const key=getTodayKey(); if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0}; dailyLog[key].play++; updateDisplay(); renderLogs();}
+
+    // --- Save/Load ---
+    function saveFile(){
+        const data = {level, pawLevel, bodyLevel, treatsGiven, chaosXP, napXP, playXP, dailyLog};
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        const dlAnchor = document.createElement('a');
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute("download", "scoobert_save.json");
+        dlAnchor.click();
+    }
+
+    function loadFile(event){
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e){
+            const loaded = JSON.parse(e.target.result);
+            level = loaded.level || 1;
+            pawLevel = loaded.pawLevel || 1;
+            bodyLevel = loaded.bodyLevel || 1;
+            treatsGiven = loaded.treatsGiven || 0;
+            chaosXP = loaded.chaosXP || 0;
+            napXP = loaded.napXP || 0;
+            playXP = loaded.playXP || 0;
+            dailyLog = loaded.dailyLog || {};
+            updateDisplay(); renderLogs();
+        };
+        reader.readAsText(file);
+    }
+
+    // --- Confetti on Birthday ---
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class ConfettiParticle{
+        constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height-canvas.height;this.size=Math.random()*8+4;this.speed=Math.random()*3+2;this.color=`hsl(${Math.random()*360},100%,50%)`;}
+        update(){this.y+=this.speed;if(this.y>canvas.height)this.y=-10;}
+        draw(){ctx.fillStyle=this.color;ctx.fillRect(this.x,this.y,this.size,this.size);}
+    }
+
+    const confettiParticles=[];
+    for(let i=0;i<150;i++) confettiParticles.push(new ConfettiParticle());
+    function animateConfetti(){ctx.clearRect(0,0,canvas.width,canvas.height);confettiParticles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animateConfetti);}
+    if(today.getDate()===birthday.getDate() && today.getMonth()===birthday.getMonth()) animateConfetti();
+
+    updateDailyLog();
+</script>
+</body>
+</html>
