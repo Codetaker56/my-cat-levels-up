@@ -4,25 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Scoobert RPG Diary</title>
+
+<!-- Google Font (cute pastel look) -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
-    body { font-family: 'Comic Sans MS', cursive; background-color: #FFDD99; color: #333; text-align: center; padding: 20px; overflow-x: hidden;}
-    .stat-bar { width: 300px; height: 20px; background-color: #eee; margin: 5px auto; border-radius: 10px; overflow: hidden;}
-    .stat-fill { height: 100%; background-color: #FF9933; width: 0%; transition: width 0.3s;}
-    button { padding: 10px 15px; margin: 5px; font-size: 14px;}
-    #confetti {position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;}
-    #cat-icon {width: 100px; margin: 10px auto; transition: transform 0.3s;}
-    .log-container { max-width: 600px; margin: 20px auto; text-align: left; }
-    .log-card { background: #fff7e0; margin: 10px 0; padding: 10px; border-radius: 8px; border-left: 6px solid #FF9933; }
-    .log-title { font-weight: bold; }
-    .xp-bar-inner { height: 10px; border-radius: 5px; margin-top: 2px;}
-    .chaos-bar { background: #FF6666; width: 0%; transition: width 0.3s;}
-    .nap-bar { background: #66CCFF; width: 0%; transition: width 0.3s;}
-    .play-bar { background: #66FF66; width: 0%; transition: width 0.3s;}
+    /* ---- Aesthetic Pastel Glow Vibes ---- */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #ffd9e8, #ffe7c7, #d9eaff);
+        background-size: 400% 400%;
+        animation: bgShift 15s ease infinite;
+        color: #444;
+        text-align: center;
+        padding: 30px;
+    }
+
+    @keyframes bgShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+        font-weight: 600;
+        color: #ff7fae;
+        text-shadow: 0 2px 8px rgba(255, 0, 92, 0.25);
+        margin-bottom: 5px;
+    }
+
+    #cat-icon {
+        width: 120px;
+        margin: 15px auto;
+        transition: transform 0.3s ease, filter 0.3s ease;
+        filter: drop-shadow(0px 4px 10px rgba(255, 174, 200, 0.6));
+    }
+    #cat-icon:hover {
+        transform: scale(1.1);
+        filter: drop-shadow(0px 6px 14px rgba(255, 139, 180, 0.9));
+    }
+
+    /* Fancy stat bars */
+    .stat-bar {
+        width: 80%;
+        height: 16px;
+        margin: 10px auto;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(6px);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(255, 140, 165, 0.25);
+    }
+
+    .stat-fill {
+        height: 100%;
+        border-radius: 12px;
+        width: 0%;
+        transition: width 0.4s ease;
+    }
+
+    #chaosBar { background: #ff8f8f; }
+    #napBar { background: #8fcbff; }
+    #playBar { background: #92ff9a; }
+
+    /* Buttons */
+    button {
+        padding: 10px 18px;
+        background: white;
+        border: 0;
+        border-radius: 12px;
+        margin: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 3px 8px rgba(255, 169, 188, 0.4);
+    }
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(255, 115, 160, 0.6);
+    }
+
+    /* Daily Log Cards */
+    .log-container {
+        max-width: 650px;
+        margin: 25px auto;
+        text-align: left;
+    }
+
+    .log-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(8px);
+        padding: 14px;
+        margin: 12px 0;
+        border-radius: 14px;
+        border-left: 6px solid #ff7fae;
+        box-shadow: 0 3px 10px rgba(255, 150, 190, 0.25);
+        animation: fadeIn 0.5s ease;
+    }
+
+    .log-title {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #ff5b9a;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .xp-bar-inner {
+        height: 8px;
+        border-radius: 5px;
+        margin-top: 3px;
+    }
+
+    .chaos-bar { background: #ff8f8f; }
+    .nap-bar { background: #8fcbff; }
+    .play-bar { background: #92ff9a; }
+
+    /* Confetti canvas */
+    #confetti {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+    }
 </style>
 </head>
+
 <body>
 
 <h1>Scoobert RPG Diary</h1>
+
 <img id="cat-icon" src="https://i.imgur.com/1bX5QH6.png" alt="Scoobert Cat Icon">
 
 <p id="level">Scoobert Level: 1</p>
@@ -32,19 +147,21 @@
 
 <h3>Chaos XP</h3>
 <div class="stat-bar"><div id="chaosBar" class="stat-fill"></div></div>
+
 <h3>Nap XP</h3>
 <div class="stat-bar"><div id="napBar" class="stat-fill"></div></div>
+
 <h3>Play XP</h3>
 <div class="stat-bar"><div id="playBar" class="stat-fill"></div></div>
 
 <div>
     <button onclick="logTreat()">Give Treat</button>
-    <button onclick="logChaos()">Add Chaos XP</button>
-    <button onclick="logNap()">Add Nap XP</button>
-    <button onclick="logPlay()">Add Play XP</button>
+    <button onclick="logChaos()">+ Chaos XP</button>
+    <button onclick="logNap()">+ Nap XP</button>
+    <button onclick="logPlay()">+ Play XP</button>
 </div>
 
-<div>
+<div style="margin-top:15px;">
     <button onclick="saveFile()">Save Scoobert</button>
     <input type="file" id="loadFileInput" onchange="loadFile(event)" style="display:none;">
     <button onclick="document.getElementById('loadFileInput').click()">Load Scoobert</button>
@@ -55,18 +172,20 @@
 <canvas id="confetti"></canvas>
 
 <script>
-    // --- Stats ---
+    /* Same JS logic you had, just cleaner & cuter */
+
     const birthday = new Date(2025, 7, 21);
     const today = new Date();
     let level = Math.floor((today - birthday)/(1000*60*60*24)) + 1;
+
     let pawLevel = 1, bodyLevel = 1, treatsGiven = 0;
     let chaosXP = 0, napXP = 0, playXP = 0;
     const xpThreshold = 10;
+
     const catIcon = document.getElementById("cat-icon");
     const logContainer = document.getElementById("logContainer");
 
-    // --- Daily Log ---
-    let dailyLog = {}; // key = date string, value = {treats, chaos, nap, play}
+    let dailyLog = {};
 
     function getTodayKey(){
         const d = new Date();
@@ -76,19 +195,14 @@
     function createLogCard(dateKey, data){
         const card = document.createElement("div");
         card.className = "log-card";
-        card.innerHTML = `<div class="log-title">Day: ${dateKey}</div>
-        Treats: ${data.treats}<br>
-        Chaos XP: <div class="xp-bar-inner chaos-bar" style="width:${data.chaos*10}%"></div>
-        Nap XP: <div class="xp-bar-inner nap-bar" style="width:${data.nap*10}%"></div>
-        Play XP: <div class="xp-bar-inner play-bar" style="width:${data.play*10}%"></div>`;
+        card.innerHTML = `
+            <div class="log-title">Day: ${dateKey}</div>
+            Treats: ${data.treats}<br>
+            Chaos XP: <div class="xp-bar-inner chaos-bar" style="width:${data.chaos*10}%"></div>
+            Nap XP: <div class="xp-bar-inner nap-bar" style="width:${data.nap*10}%"></div>
+            Play XP: <div class="xp-bar-inner play-bar" style="width:${data.play*10}%"></div>
+        `;
         return card;
-    }
-
-    function updateDailyLog(){
-        const key = getTodayKey();
-        if(!dailyLog[key]) dailyLog[key] = {treats:0, chaos:0, nap:0, play:0};
-        updateDisplay();
-        renderLogs();
     }
 
     function renderLogs(){
@@ -98,9 +212,8 @@
         });
     }
 
-    // --- Functions ---
     function checkUpgrade(xp, statLevel){
-        if(xp >= xpThreshold){ xp -= xpThreshold; statLevel+=1;}
+        if(xp >= xpThreshold){ xp -= xpThreshold; statLevel++; }
         return [xp, statLevel];
     }
 
@@ -112,37 +225,51 @@
         document.getElementById("paw").innerText = `Paw Size Level: ${pawLevel}`;
         document.getElementById("body").innerText = `Body Size Level: ${bodyLevel}`;
         document.getElementById("treats").innerText = `Treats Given: ${treatsGiven}`;
-        document.getElementById("chaosBar").style.width = (chaosXP*10)+'%';
-        document.getElementById("napBar").style.width = (napXP*10)+'%';
-        document.getElementById("playBar").style.width = (playXP*10)+'%';
+
+        document.getElementById("chaosBar").style.width = chaosXP*10 + "%";
+        document.getElementById("napBar").style.width = napXP*10 + "%";
+        document.getElementById("playBar").style.width = playXP*10 + "%";
+
         catIcon.style.transform = `scale(${1 + level*0.02})`;
     }
 
-    function logTreat(){ treatsGiven++; chaosXP+=1; napXP+=1; playXP+=2;
+    function addToLog(xpType, amount){
         const key = getTodayKey();
-        if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0};
-        dailyLog[key].treats++; dailyLog[key].chaos++; dailyLog[key].nap++; dailyLog[key].play+=2;
-        updateDisplay(); renderLogs();
+        if(!dailyLog[key]) dailyLog[key] = {treats:0, chaos:0, nap:0, play:0};
+        dailyLog[key][xpType] += amount;
+        renderLogs();
     }
-    function logChaos(){ chaosXP+=1; const key=getTodayKey(); if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0}; dailyLog[key].chaos++; updateDisplay(); renderLogs();}
-    function logNap(){ napXP+=1; const key=getTodayKey(); if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0}; dailyLog[key].nap++; updateDisplay(); renderLogs();}
-    function logPlay(){ playXP+=1; const key=getTodayKey(); if(!dailyLog[key]) dailyLog[key]={treats:0, chaos:0, nap:0, play:0}; dailyLog[key].play++; updateDisplay(); renderLogs();}
 
-    // --- Save/Load ---
+    function logTreat(){
+        treatsGiven++;
+        chaosXP++; napXP++; playXP+=2;
+        addToLog("treats",1);
+        addToLog("chaos",1);
+        addToLog("nap",1);
+        addToLog("play",2);
+        updateDisplay();
+    }
+
+    function logChaos(){ chaosXP++; addToLog("chaos",1); updateDisplay(); }
+    function logNap(){ napXP++; addToLog("nap",1); updateDisplay(); }
+    function logPlay(){ playXP++; addToLog("play",1); updateDisplay(); }
+
     function saveFile(){
         const data = {level, pawLevel, bodyLevel, treatsGiven, chaosXP, napXP, playXP, dailyLog};
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-        const dlAnchor = document.createElement('a');
-        dlAnchor.setAttribute("href", dataStr);
-        dlAnchor.setAttribute("download", "scoobert_save.json");
-        dlAnchor.click();
+        const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "scoobert_save.json";
+        a.click();
     }
 
     function loadFile(event){
-        const file = event.target.files[0];
         const reader = new FileReader();
-        reader.onload = function(e){
+        reader.onload = e=>{
             const loaded = JSON.parse(e.target.result);
+
             level = loaded.level || 1;
             pawLevel = loaded.pawLevel || 1;
             bodyLevel = loaded.bodyLevel || 1;
@@ -151,29 +278,54 @@
             napXP = loaded.napXP || 0;
             playXP = loaded.playXP || 0;
             dailyLog = loaded.dailyLog || {};
-            updateDisplay(); renderLogs();
+
+            updateDisplay();
+            renderLogs();
         };
-        reader.readAsText(file);
+        reader.readAsText(event.target.files[0]);
     }
 
-    // --- Confetti on Birthday ---
+    /* ✨ Confetti Birthday Magic ✨ */
     const canvas = document.getElementById("confetti");
     const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
 
-    class ConfettiParticle{
-        constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height-canvas.height;this.size=Math.random()*8+4;this.speed=Math.random()*3+2;this.color=`hsl(${Math.random()*360},100%,50%)`;}
-        update(){this.y+=this.speed;if(this.y>canvas.height)this.y=-10;}
-        draw(){ctx.fillStyle=this.color;ctx.fillRect(this.x,this.y,this.size,this.size);}
+    class ConfettiParticle {
+        constructor(){
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * -canvas.height;
+            this.size = Math.random()*8 + 4;
+            this.speed = Math.random()*2 + 1;
+            this.color = `hsl(${Math.random()*360},100%,75%)`;
+        }
+        update(){
+            this.y += this.speed;
+            if(this.y > canvas.height) this.y = -10;
+        }
+        draw(){
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.size, this.size);
+        }
     }
 
-    const confettiParticles=[];
-    for(let i=0;i<150;i++) confettiParticles.push(new ConfettiParticle());
-    function animateConfetti(){ctx.clearRect(0,0,canvas.width,canvas.height);confettiParticles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animateConfetti);}
-    if(today.getDate()===birthday.getDate() && today.getMonth()===birthday.getMonth()) animateConfetti();
+    const confetti = [];
+    for(let i=0;i<120;i++) confetti.push(new ConfettiParticle());
 
-    updateDailyLog();
+    function animateConfetti(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        confetti.forEach(p=>{ p.update(); p.draw(); });
+        requestAnimationFrame(animateConfetti);
+    }
+
+    if(today.getDate()==birthday.getDate() && today.getMonth()==birthday.getMonth()){
+        animateConfetti();
+    }
+
+    updateDisplay();
+    renderLogs();
 </script>
+
 </body>
 </html>
+
