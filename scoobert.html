@@ -3,329 +3,705 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scoobert RPG Diary</title>
-
-<!-- Google Font (cute pastel look) -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<title>Scoobert's Night Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-    /* ---- Aesthetic Pastel Glow Vibes ---- */
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #ffd9e8, #ffe7c7, #d9eaff);
-        background-size: 400% 400%;
-        animation: bgShift 15s ease infinite;
-        color: #444;
-        text-align: center;
-        padding: 30px;
-    }
+  :root {
+    --void:    #06090f;
+    --deep:    #0b1120;
+    --panel:   #0f1829;
+    --surface: #162035;
+    --rim:     #1e2d47;
+    --amber:   #f0a830;
+    --amber-d: #c47d10;
+    --amber-g: rgba(240,168,48,0.08);
+    --cream:   #e8dfc8;
+    --muted:   #5a6a85;
+    --ghost:   #2a3a55;
+    --chaos:   #e05c4a;
+    --nap:     #4a8fa8;
+    --play:    #5aad6e;
+    --glow:    0 0 30px rgba(240,168,48,0.15), 0 0 60px rgba(240,168,48,0.07);
+  }
 
-    @keyframes bgShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    h1 {
-        font-weight: 600;
-        color: #ff7fae;
-        text-shadow: 0 2px 8px rgba(255, 0, 92, 0.25);
-        margin-bottom: 5px;
-    }
+  body {
+    font-family: 'IM Fell English', Georgia, serif;
+    background: var(--void);
+    color: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 80px;
+    position: relative;
+    overflow-x: hidden;
+  }
 
-    #cat-icon {
-        width: 120px;
-        margin: 15px auto;
-        transition: transform 0.3s ease, filter 0.3s ease;
-        filter: drop-shadow(0px 4px 10px rgba(255, 174, 200, 0.6));
-    }
-    #cat-icon:hover {
-        transform: scale(1.1);
-        filter: drop-shadow(0px 6px 14px rgba(255, 139, 180, 0.9));
-    }
+  #stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    /* Fancy stat bars */
-    .stat-bar {
-        width: 80%;
-        height: 16px;
-        margin: 10px auto;
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(6px);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 6px rgba(255, 140, 165, 0.25);
-    }
+  body::before {
+    content: '';
+    position: fixed;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(240,168,48,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+    animation: lampFlicker 8s ease-in-out infinite;
+  }
 
-    .stat-fill {
-        height: 100%;
-        border-radius: 12px;
-        width: 0%;
-        transition: width 0.4s ease;
-    }
+  @keyframes lampFlicker {
+    0%,100% { opacity: 1; }
+    33%      { opacity: 0.85; }
+    66%      { opacity: 0.95; }
+  }
 
-    #chaosBar { background: #ff8f8f; }
-    #napBar { background: #8fcbff; }
-    #playBar { background: #92ff9a; }
+  .panel {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 560px;
+    background: var(--panel);
+    border: 1px solid var(--rim);
+    border-radius: 2px;
+    box-shadow:
+      0 0 0 1px var(--ghost),
+      0 4px 20px rgba(0,0,0,0.6),
+      0 20px 60px rgba(0,0,0,0.5),
+      var(--glow);
+    overflow: hidden;
+  }
 
-    /* Buttons */
-    button {
-        padding: 10px 18px;
-        background: white;
-        border: 0;
-        border-radius: 12px;
-        margin: 6px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: 0.2s;
-        box-shadow: 0 3px 8px rgba(255, 169, 188, 0.4);
-    }
-    button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 12px rgba(255, 115, 160, 0.6);
-    }
+  .panel-top-rule {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+    opacity: 0.6;
+  }
 
-    /* Daily Log Cards */
-    .log-container {
-        max-width: 650px;
-        margin: 25px auto;
-        text-align: left;
-    }
+  .header {
+    padding: 40px 40px 32px;
+    text-align: center;
+    border-bottom: 1px solid var(--ghost);
+    background: linear-gradient(180deg, rgba(240,168,48,0.04) 0%, transparent 100%);
+  }
 
-    .log-card {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(8px);
-        padding: 14px;
-        margin: 12px 0;
-        border-radius: 14px;
-        border-left: 6px solid #ff7fae;
-        box-shadow: 0 3px 10px rgba(255, 150, 190, 0.25);
-        animation: fadeIn 0.5s ease;
-    }
+  .cat-container {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 20px;
+  }
 
-    .log-title {
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #ff5b9a;
-    }
+  .cat-halo {
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(240,168,48,0.25) 0%, transparent 70%);
+    animation: halo 4s ease-in-out infinite;
+  }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+  @keyframes halo {
+    0%,100% { transform: scale(1);    opacity: 0.8; }
+    50%      { transform: scale(1.15); opacity: 1;   }
+  }
 
-    .xp-bar-inner {
-        height: 8px;
-        border-radius: 5px;
-        margin-top: 3px;
-    }
+  .cat-ring {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(240,168,48,0.3);
+  }
 
-    .chaos-bar { background: #ff8f8f; }
-    .nap-bar { background: #8fcbff; }
-    .play-bar { background: #92ff9a; }
+  .cat-container img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: var(--surface);
+    padding: 10px;
+    border: 1px solid var(--rim);
+    filter: sepia(20%) brightness(0.95) contrast(1.05);
+    transition: filter 0.4s ease, transform 0.4s cubic-bezier(.34,1.56,.64,1);
+    position: relative;
+    z-index: 1;
+  }
 
-    /* Confetti canvas */
-    #confetti {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw;
-        height: 100vh;
-        pointer-events: none;
-    }
+  .cat-container:hover img {
+    filter: sepia(0%) brightness(1.1);
+    transform: rotate(-8deg) scale(1.1);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: var(--amber);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(240,168,48,0.4);
+  }
+
+  .subtitle {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 5px;
+    letter-spacing: 1px;
+  }
+
+  .rule {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 40px;
+    margin: 4px 0;
+    color: var(--ghost);
+    font-size: 0.6rem;
+    letter-spacing: 4px;
+  }
+  .rule::before, .rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--ghost);
+  }
+
+  .section {
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--ghost);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--ghost);
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .stat-cell {
+    background: var(--surface);
+    border: 1px solid var(--ghost);
+    border-radius: 2px;
+    padding: 10px 8px;
+    text-align: center;
+    transition: border-color 0.2s ease;
+  }
+  .stat-cell:hover { border-color: rgba(240,168,48,0.3); }
+
+  .stat-cell .val {
+    font-family: 'Courier Prime', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .stat-cell .lbl {
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    font-style: italic;
+  }
+
+  .gauge-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .gauge-row:last-child { margin-bottom: 0; }
+
+  .gauge-name {
+    width: 56px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .gauge-track {
+    flex: 1;
+    height: 6px;
+    background: var(--ghost);
+    position: relative;
+    overflow: visible;
+  }
+  .gauge-track::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(10% - 1px),
+      rgba(255,255,255,0.06) calc(10% - 1px),
+      rgba(255,255,255,0.06) 10%
+    );
+  }
+
+  .gauge-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.6s cubic-bezier(.22,1,.36,1);
+    position: relative;
+  }
+  .gauge-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: -3px; bottom: -3px;
+    width: 2px;
+    background: white;
+    opacity: 0.8;
+    border-radius: 1px;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  .gauge-fill.chaos { background: linear-gradient(90deg, #8a2a20, var(--chaos)); box-shadow: 0 0 8px rgba(224,92,74,0.5); }
+  .gauge-fill.nap   { background: linear-gradient(90deg, #1e4a5c, var(--nap));   box-shadow: 0 0 8px rgba(74,143,168,0.5); }
+  .gauge-fill.play  { background: linear-gradient(90deg, #1e5030, var(--play));  box-shadow: 0 0 8px rgba(90,173,110,0.5); }
+
+  .gauge-num {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .btn {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.82rem;
+    padding: 11px 10px;
+    background: var(--surface);
+    border: 1px solid var(--ghost);
+    border-radius: 2px;
+    color: var(--cream);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(240,168,48,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .btn:hover { border-color: var(--amber-d); color: var(--amber); transform: translateY(-1px); }
+  .btn:hover::before { opacity: 1; }
+  .btn:active { transform: translateY(0); }
+
+  .btn.primary {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #1a1000, #241500);
+    border-color: var(--amber-d);
+    color: var(--amber);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+  .btn.primary:hover {
+    background: linear-gradient(135deg, #241500, #2e1800);
+    box-shadow: 0 0 20px rgba(240,168,48,0.2), 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  .btn.secondary {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+  .btn.secondary:hover { color: var(--cream); }
+
+  .save-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+
+  .log-empty {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.82rem;
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .log-entry {
+    border-bottom: 1px solid var(--ghost);
+    padding: 14px 0;
+    animation: entryIn 0.4s ease both;
+  }
+  .log-entry:last-child { border-bottom: none; padding-bottom: 0; }
+  .log-entry:first-child { padding-top: 0; }
+
+  @keyframes entryIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .log-date {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--amber);
+    opacity: 0.7;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .log-treats {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+
+  .log-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .log-bar-label {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    width: 44px;
+    text-align: right;
+  }
+  .log-track {
+    flex: 1;
+    height: 3px;
+    background: var(--ghost);
+  }
+  .log-fill { height: 100%; transition: width 0.5s ease; }
+  .log-fill.chaos { background: var(--chaos); box-shadow: 0 0 6px rgba(224,92,74,0.6); }
+  .log-fill.nap   { background: var(--nap);   box-shadow: 0 0 6px rgba(74,143,168,0.6); }
+  .log-fill.play  { background: var(--play);  box-shadow: 0 0 6px rgba(90,173,110,0.6); }
+
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--surface);
+    border: 1px solid var(--amber-d);
+    color: var(--amber);
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 10px 22px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(240,168,48,0.2), 0 4px 20px rgba(0,0,0,0.5);
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .birthday-banner {
+    display: none;
+    text-align: center;
+    padding: 12px 40px;
+    font-style: italic;
+    color: var(--amber);
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--ghost);
+    background: linear-gradient(135deg, rgba(240,168,48,0.04), transparent);
+    animation: birthdayPulse 2s ease-in-out infinite;
+  }
+  @keyframes birthdayPulse {
+    0%,100% { opacity: 0.8; }
+    50%      { opacity: 1; }
+  }
+
+  .panel-bottom-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240,168,48,0.2), transparent);
+  }
+
+  @media (max-width: 480px) {
+    .section { padding: 20px 24px; }
+    .header  { padding: 30px 24px 24px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .rule { padding: 0 24px; }
+    .birthday-banner { padding: 12px 24px; }
+  }
 </style>
 </head>
-
 <body>
 
-<h1>Scoobert RPG Diary</h1>
+<canvas id="stars"></canvas>
 
-<img id="cat-icon" src="https://i.imgur.com/1bX5QH6.png" alt="Scoobert Cat Icon">
+<div class="panel">
+  <div class="panel-top-rule"></div>
 
-<p id="level">Scoobert Level: 1</p>
-<p id="paw">Paw Size Level: 1</p>
-<p id="body">Body Size Level: 1</p>
-<p id="treats">Treats Given: 0</p>
+  <div class="birthday-banner" id="birthdayBanner">
+    ✦ &nbsp; happy birthday, scoobert &nbsp; ✦
+  </div>
 
-<h3>Chaos XP</h3>
-<div class="stat-bar"><div id="chaosBar" class="stat-fill"></div></div>
+  <div class="header">
+    <div class="cat-container">
+      <div class="cat-halo"></div>
+      <div class="cat-ring"></div>
+      <img id="catImg" src="https://i.imgur.com/1bX5QH6.png" alt="Scoobert">
+    </div>
+    <h1>Scoobert's Night Log</h1>
+    <p class="subtitle">a faithful record of feline proceedings</p>
+  </div>
 
-<h3>Nap XP</h3>
-<div class="stat-bar"><div id="napBar" class="stat-fill"></div></div>
+  <div class="rule">✦</div>
 
-<h3>Play XP</h3>
-<div class="stat-bar"><div id="playBar" class="stat-fill"></div></div>
+  <div class="section">
+    <div class="section-label">status</div>
+    <div class="stat-grid">
+      <div class="stat-cell">
+        <span class="val" id="levelVal">1</span>
+        <span class="lbl">day no.</span>
+      </div>
+      <div class="stat-cell">
+        <span class="val" id="pawVal">1</span>
+        <span class="lbl">paw size</span>
+      </div>
+      <div class="stat-cell">
+        <span class="val" id="bodyVal">1</span>
+        <span class="lbl">floof</span>
+      </div>
+      <div class="stat-cell">
+        <span class="val" id="treatsVal">0</span>
+        <span class="lbl">treats</span>
+      </div>
+    </div>
+  </div>
 
-<div>
-    <button onclick="logTreat()">Give Treat</button>
-    <button onclick="logChaos()">+ Chaos XP</button>
-    <button onclick="logNap()">+ Nap XP</button>
-    <button onclick="logPlay()">+ Play XP</button>
+  <div class="section">
+    <div class="section-label">experience</div>
+    <div class="gauge-row">
+      <span class="gauge-name">CHAOS</span>
+      <div class="gauge-track"><div class="gauge-fill chaos" id="chaosBar"></div></div>
+      <span class="gauge-num" id="chaosNum">0</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-name">NAP</span>
+      <div class="gauge-track"><div class="gauge-fill nap" id="napBar"></div></div>
+      <span class="gauge-num" id="napNum">0</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-name">PLAY</span>
+      <div class="gauge-track"><div class="gauge-fill play" id="playBar"></div></div>
+      <span class="gauge-num" id="playNum">0</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">actions</div>
+    <div class="btn-group">
+      <button class="btn primary" onclick="logTreat()">✦ &nbsp; Give a Treat</button>
+      <button class="btn" onclick="logChaos()">🌀 &nbsp; Chaos</button>
+      <button class="btn" onclick="logNap()">🌙 &nbsp; Nap</button>
+      <button class="btn" onclick="logPlay()">🐾 &nbsp; Play</button>
+    </div>
+    <div class="save-row">
+      <button class="btn secondary" onclick="saveFile()">SAVE LOG</button>
+      <input type="file" id="loadInput" onchange="loadFile(event)" accept=".json" style="display:none">
+      <button class="btn secondary" onclick="document.getElementById('loadInput').click()">LOAD LOG</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">daily records</div>
+    <div id="logContainer"><p class="log-empty">No entries yet. The night is young.</p></div>
+  </div>
+
+  <div class="panel-bottom-rule"></div>
 </div>
 
-<div style="margin-top:15px;">
-    <button onclick="saveFile()">Save Scoobert</button>
-    <input type="file" id="loadFileInput" onchange="loadFile(event)" style="display:none;">
-    <button onclick="document.getElementById('loadFileInput').click()">Load Scoobert</button>
-</div>
-
-<div class="log-container" id="logContainer"></div>
-
-<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
 
 <script>
-    /* Same JS logic you had, just cleaner & cuter */
+  /* ── Star field ── */
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 
-    const birthday = new Date(2025, 7, 21);
-    const today = new Date();
-    let level = Math.floor((today - birthday)/(1000*60*60*24)) + 1;
+  const stars = Array.from({ length: 200 }, () => ({
+    x: Math.random(), y: Math.random(),
+    r: Math.random() * 1.3 + 0.2,
+    speed: Math.random() * 0.018 + 0.004,
+    phase: Math.random() * Math.PI * 2,
+  }));
 
-    let pawLevel = 1, bodyLevel = 1, treatsGiven = 0;
-    let chaosXP = 0, napXP = 0, playXP = 0;
-    const xpThreshold = 10;
+  function drawStars(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const alpha = 0.15 + 0.5 * (0.5 + 0.5 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,210,190,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  requestAnimationFrame(drawStars);
 
-    const catIcon = document.getElementById("cat-icon");
-    const logContainer = document.getElementById("logContainer");
+  /* ── State ── */
+  const birthday = new Date(2025, 7, 21);
+  const today    = new Date();
+  let level      = Math.max(1, Math.floor((today - birthday) / 86400000) + 1);
 
-    let dailyLog = {};
+  let pawLevel = 1, bodyLevel = 1, playLevel = 1, treatsGiven = 0;
+  let chaosXP = 0, napXP = 0, playXP = 0;
+  const XP_MAX = 10;
+  let dailyLog = {};
 
-    function getTodayKey(){
-        const d = new Date();
-        return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
-    }
+  if (today.getDate() === birthday.getDate() && today.getMonth() === birthday.getMonth())
+    document.getElementById('birthdayBanner').style.display = 'block';
 
-    function createLogCard(dateKey, data){
-        const card = document.createElement("div");
-        card.className = "log-card";
-        card.innerHTML = `
-            <div class="log-title">Day: ${dateKey}</div>
-            Treats: ${data.treats}<br>
-            Chaos XP: <div class="xp-bar-inner chaos-bar" style="width:${data.chaos*10}%"></div>
-            Nap XP: <div class="xp-bar-inner nap-bar" style="width:${data.nap*10}%"></div>
-            Play XP: <div class="xp-bar-inner play-bar" style="width:${data.play*10}%"></div>
-        `;
-        return card;
-    }
+  function todayKey() { return today.toISOString().slice(0, 10); }
 
-    function renderLogs(){
-        logContainer.innerHTML = "";
-        Object.keys(dailyLog).sort().forEach(k=>{
-            logContainer.appendChild(createLogCard(k, dailyLog[k]));
-        });
-    }
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
 
-    function checkUpgrade(xp, statLevel){
-        if(xp >= xpThreshold){ xp -= xpThreshold; statLevel++; }
-        return [xp, statLevel];
-    }
+  function checkUpgrade(xp, stat, label) {
+    if (xp >= XP_MAX) { xp -= XP_MAX; stat++; showToast(`${label} reached level ${stat}`); }
+    return [xp, stat];
+  }
 
-    function updateDisplay(){
-        [chaosXP, pawLevel] = checkUpgrade(chaosXP, pawLevel);
-        [napXP, bodyLevel] = checkUpgrade(napXP, bodyLevel);
+  function updateDisplay() {
+    [chaosXP, pawLevel]  = checkUpgrade(chaosXP, pawLevel,  'paw size');
+    [napXP,   bodyLevel] = checkUpgrade(napXP,   bodyLevel, 'body floof');
+    [playXP,  playLevel] = checkUpgrade(playXP,  playLevel, 'play level');
 
-        document.getElementById("level").innerText = `Scoobert Level: ${level}`;
-        document.getElementById("paw").innerText = `Paw Size Level: ${pawLevel}`;
-        document.getElementById("body").innerText = `Body Size Level: ${bodyLevel}`;
-        document.getElementById("treats").innerText = `Treats Given: ${treatsGiven}`;
+    document.getElementById('levelVal').textContent  = level;
+    document.getElementById('pawVal').textContent    = pawLevel;
+    document.getElementById('bodyVal').textContent   = bodyLevel;
+    document.getElementById('treatsVal').textContent = treatsGiven;
 
-        document.getElementById("chaosBar").style.width = chaosXP*10 + "%";
-        document.getElementById("napBar").style.width = napXP*10 + "%";
-        document.getElementById("playBar").style.width = playXP*10 + "%";
+    document.getElementById('chaosBar').style.width = (chaosXP / XP_MAX * 100) + '%';
+    document.getElementById('napBar').style.width   = (napXP   / XP_MAX * 100) + '%';
+    document.getElementById('playBar').style.width  = (playXP  / XP_MAX * 100) + '%';
 
-        catIcon.style.transform = `scale(${1 + level*0.02})`;
-    }
+    document.getElementById('chaosNum').textContent = chaosXP;
+    document.getElementById('napNum').textContent   = napXP;
+    document.getElementById('playNum').textContent  = playXP;
 
-    function addToLog(xpType, amount){
-        const key = getTodayKey();
-        if(!dailyLog[key]) dailyLog[key] = {treats:0, chaos:0, nap:0, play:0};
-        dailyLog[key][xpType] += amount;
-        renderLogs();
-    }
+    document.getElementById('catImg').style.transform = `scale(${1 + level * 0.012})`;
+  }
 
-    function logTreat(){
-        treatsGiven++;
-        chaosXP++; napXP++; playXP+=2;
-        addToLog("treats",1);
-        addToLog("chaos",1);
-        addToLog("nap",1);
-        addToLog("play",2);
-        updateDisplay();
-    }
-
-    function logChaos(){ chaosXP++; addToLog("chaos",1); updateDisplay(); }
-    function logNap(){ napXP++; addToLog("nap",1); updateDisplay(); }
-    function logPlay(){ playXP++; addToLog("play",1); updateDisplay(); }
-
-    function saveFile(){
-        const data = {level, pawLevel, bodyLevel, treatsGiven, chaosXP, napXP, playXP, dailyLog};
-        const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "scoobert_save.json";
-        a.click();
-    }
-
-    function loadFile(event){
-        const reader = new FileReader();
-        reader.onload = e=>{
-            const loaded = JSON.parse(e.target.result);
-
-            level = loaded.level || 1;
-            pawLevel = loaded.pawLevel || 1;
-            bodyLevel = loaded.bodyLevel || 1;
-            treatsGiven = loaded.treatsGiven || 0;
-            chaosXP = loaded.chaosXP || 0;
-            napXP = loaded.napXP || 0;
-            playXP = loaded.playXP || 0;
-            dailyLog = loaded.dailyLog || {};
-
-            updateDisplay();
-            renderLogs();
-        };
-        reader.readAsText(event.target.files[0]);
-    }
-
-    /* ✨ Confetti Birthday Magic ✨ */
-    const canvas = document.getElementById("confetti");
-    const ctx = canvas.getContext("2d");
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-
-    class ConfettiParticle {
-        constructor(){
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * -canvas.height;
-            this.size = Math.random()*8 + 4;
-            this.speed = Math.random()*2 + 1;
-            this.color = `hsl(${Math.random()*360},100%,75%)`;
-        }
-        update(){
-            this.y += this.speed;
-            if(this.y > canvas.height) this.y = -10;
-        }
-        draw(){
-            ctx.fillStyle = this.color;
-            ctx.fillRect(this.x, this.y, this.size, this.size);
-        }
-    }
-
-    const confetti = [];
-    for(let i=0;i<120;i++) confetti.push(new ConfettiParticle());
-
-    function animateConfetti(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        confetti.forEach(p=>{ p.update(); p.draw(); });
-        requestAnimationFrame(animateConfetti);
-    }
-
-    if(today.getDate()==birthday.getDate() && today.getMonth()==birthday.getMonth()){
-        animateConfetti();
-    }
-
-    updateDisplay();
+  function addToLog(updates) {
+    const key = todayKey();
+    if (!dailyLog[key]) dailyLog[key] = { treats: 0, chaos: 0, nap: 0, play: 0 };
+    for (const [k, v] of Object.entries(updates)) dailyLog[key][k] += v;
     renderLogs();
-</script>
+  }
 
+  function renderLogs() {
+    const c = document.getElementById('logContainer');
+    const keys = Object.keys(dailyLog).sort().reverse();
+    if (!keys.length) { c.innerHTML = '<p class="log-empty">No entries yet. The night is young.</p>'; return; }
+    c.innerHTML = keys.map(key => {
+      const d = dailyLog[key];
+      const [y, m, day] = key.split('-').map(Number);
+      const dateStr = new Date(y, m - 1, day)
+        .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+        .toUpperCase();
+      return `<div class="log-entry">
+        <div class="log-date">${dateStr}</div>
+        <div class="log-treats">${d.treats} treat${d.treats !== 1 ? 's' : ''} dispensed</div>
+        ${logBar('chaos', d.chaos)}
+        ${logBar('nap',   d.nap)}
+        ${logBar('play',  d.play)}
+      </div>`;
+    }).join('');
+  }
+
+  function logBar(type, val) {
+    return `<div class="log-bar-row">
+      <span class="log-bar-label">${type.toUpperCase()}</span>
+      <div class="log-track"><div class="log-fill ${type}" style="width:${Math.min(100, val * 10)}%"></div></div>
+    </div>`;
+  }
+
+  function logTreat()  { treatsGiven++; chaosXP++; napXP++; playXP += 2; addToLog({ treats:1,chaos:1,nap:1,play:2 }); showToast('treat received with great dignity'); updateDisplay(); }
+  function logChaos()  { chaosXP++;  addToLog({ chaos: 1 }); showToast('chaos duly recorded');     updateDisplay(); }
+  function logNap()    { napXP++;    addToLog({ nap:   1 }); showToast('napping... do not disturb'); updateDisplay(); }
+  function logPlay()   { playXP++;   addToLog({ play:  1 }); showToast('play session logged');      updateDisplay(); }
+
+  function saveFile() {
+    const data = { level, pawLevel, bodyLevel, playLevel, treatsGiven, chaosXP, napXP, playXP, dailyLog };
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+    a.download = 'scoobert_log.json';
+    a.click();
+    showToast('log committed to disk');
+  }
+
+  function loadFile(e) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        level = d.level||1; pawLevel=d.pawLevel||1; bodyLevel=d.bodyLevel||1; playLevel=d.playLevel||1;
+        treatsGiven=d.treatsGiven||0; chaosXP=d.chaosXP||0; napXP=d.napXP||0; playXP=d.playXP||0;
+        dailyLog=d.dailyLog||{};
+        updateDisplay(); renderLogs();
+        showToast('log restored from archive');
+      } catch { showToast('error: could not parse log file'); }
+    };
+    reader.readAsText(e.target.files[0]);
+    e.target.value = '';
+  }
+
+  updateDisplay();
+  renderLogs();
+</script>
 </body>
 </html>
-
